@@ -6,11 +6,11 @@ export const updateVersion = async (nextVersion, originPackageJson) => {
   const content = { ...originPackageJson, version: nextVersion };
   const spinner = ora("Loading unicorns").start();
 
-  await new Promise((resolve) => {
+  /* await new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, 2000);
-  });
+  }); */
 
   await fse.writeJson(PACKAGE_ROOT, content, { spaces: 2 });
   spinner.stop();

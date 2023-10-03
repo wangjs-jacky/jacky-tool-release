@@ -1,17 +1,17 @@
 {
   "name": "jacky-tool-release",
-  "version": "1.0.0",
+  "version": "5.3.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "ora": "^5.1.0",
-    "inquirer": "^8.2.0",
-    "fs-extra": "^11.1.1",
-    "semver": "^7.5.4",
     "cac": "^6.7.14",
+    "fs-extra": "^11.1.1",
+    "inquirer": "^8.2.0",
+    "inquirer-interrupted-prompt": "^2.0.0",
+    "ora": "^5.1.0",
+    "semver": "^7.5.4",
     "typescript": "^5.2.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "node ./dist/index.js",
     "start": "tsc -w"
