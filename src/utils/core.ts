@@ -1,5 +1,10 @@
 import cp from "child_process";
-import ora from "ora";
+import ora, { promise } from "ora";
+import { failCallbacks } from "./AsyncSeriresHook";
+const { execSync } = cp;
+
+const util = require("util");
+const exec = util.promisify(cp.exec);
 
 const basicCatchError = (err) => {
   console.log("发布失败，失败原因\n", err);
@@ -9,21 +14,6 @@ interface OptsType {
   ctx?: Record<"string", any>;
   cachError?: (err: Error) => boolean;
 }
-
-const { execSync, exec } = cp;
-
-/* export function compose(middleware, opts: OptsType = {}) {
-  let { ctx = {}, cachError = basicCatchError } = opts;
-
-  function dispatch(index, ctx) {
-    const curMiddleware = middleware[index];
-    const next = (addOptions) => {
-      dispatch(index + 1, { ...ctx, ...addOptions });
-    };
-    return Promise.resolve(curMiddleware(next, ctx)).catch(cachError);
-  }
-  dispatch(0, ctx);
-} */
 
 export function compose(middleware, opts: OptsType = {}) {
   let { ctx = {}, cachError = basicCatchError } = opts;
@@ -42,35 +32,32 @@ export function compose(middleware, opts: OptsType = {}) {
   dispatch(0);
 }
 
-export const runSync = (command: stirng, isShowSpin = false) => {
-  let spinner;
-  if (isShowSpin) {
-    spinner = ora(`开启执行 ${command} 命令`).start();
-  }
-
+export const runSync = (command: stirng) => {
   try {
     return execSync(command, { cwd: process.cwd(), encoding: "utf-8" });
-  } catch (error) {
-    console.log("error", error);
-    spinner?.fail("task fail");
-  }
-
-  spinner?.stop();
+  } catch (error) {}
 };
 
 export const runAsync = async (command: stirng, isShowSpin = false) => {
   let spinner;
-  let res;
+
   if (isShowSpin) {
     spinner = ora(`开启执行 ${command} 命令`).start();
   }
 
   try {
-    res = await exec(command, { cwd: process.cwd(), encoding: "utf-8" });
+    const { stdout, stderr } = await exec(command, {
+      cwd: process.cwd(),
+      encoding: "utf-8",
+    });
+    return {
+      stdout,
+      stderr,
+    };
   } catch (error) {
     console.log("error", error);
     spinner?.fail("task fail");
   }
+
   spinner?.stop();
-  return res;
 };

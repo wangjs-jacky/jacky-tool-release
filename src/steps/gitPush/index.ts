@@ -62,7 +62,7 @@ export const gitPush = async () => {
     isValid = checkCommitLint(commitMsg);
   } while (!isValid);
 
-  /* const spinner = ora("准备推送代码至git仓库").start(); */
+  const spinner = ora("准备推送代码至git仓库").start();
 
   /* 获取当前 branch */
   const curBranchName = runSync("git symbolic-ref --short HEAD");
@@ -71,6 +71,16 @@ export const gitPush = async () => {
     `git branch -r | grep -w "origin/${curBranchName}"`,
   );
 
-  await runAsync(`git add .`, true);
-  await runAsync(`git commit -m "${commitMsg}"`, true);
+  /* runSync("ccc"); */
+
+  await runAsync(`git add .`);
+
+  await runAsync(`git commit -m "${commitMsg}"`);
+  if (!isExistCurBranch) {
+    await runAsync(`git push --set-upstream origin ${curBranchName}`);
+  } else {
+    await runAsync(`git push`);
+  }
+
+  spinner.succeed("已推送代码至git仓库");
 };

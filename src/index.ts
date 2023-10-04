@@ -18,16 +18,23 @@ const middleware_init = (next, ctxRef) => {
 
   /* 监听 ctrl + c 事件 */
   process.on("SIGINT", async function () {
-    console.log("123");
-
     await failCallbacks.promise().then(() => {
       console.log("clean");
     });
     process.exit(0);
   });
 
+  /* process.on 只能触发同步任务 */
   process.on("exit", (code) => {
-    /* console.log("进程即将退出，退出码为：", code); */
+    /* 1 - 异常退出时 */
+    if (code === 1) {
+      /* failCallbacks.promise(); */
+      /* const main = async () => {
+        await failCallbacks.promise();
+        process.exit(1);
+      };
+      main(); */
+    }
   });
 
   ctxRef.current = {
