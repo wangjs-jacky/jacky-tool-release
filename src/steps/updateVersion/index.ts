@@ -11,6 +11,6 @@ export const updateVersion = async (nextVersion, originPackageJson) => {
   return async () => {
     console.log("流程出现错误，正在回退版本");
     /* fse.writeFileSync(PACKAGE_ROOT, JSON.stringify(originPackageJson, null, 2)); */
-    await fse.outputJson(PACKAGE_ROOT, { name: "123" }, { space: 2 });
+    await fse.outputJson(PACKAGE_ROOT, originPackageJson, { space: 2 });
   };
 };
