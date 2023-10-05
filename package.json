@@ -1,6 +1,6 @@
 {
   "name": "jacky-tool-release",
-  "version": "5.5.1",
+  "version": "15.0.0-0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -13,6 +13,10 @@
     "typescript": "^5.2.2",
     "chalk": "^4.1.1",
     "conventional-changelog-cli": "^2.2.2"
+  },
+  "devDependencies": {
+    "@umijs/fabric": "^3.0.0",
+    "eslint": "~7.32.0"
   },
   "scripts": {
     "test": "node ./dist/index.js",

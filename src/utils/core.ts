@@ -1,15 +1,17 @@
 import cp from "child_process";
-import ora, { promise } from "ora";
 import { failCallbacks } from "./AsyncSeriresHook";
 import { info } from "./info";
-const { execSync } = cp;
+import ora from "ora";
+const { execSync, exec } = cp;
 
-const util = require("util");
-const exec = util.promisify(cp.exec);
+/* const util = require("util");
+const exec = util.promisify(cp.exec); */
 
-const basicCatchError = (err) => {
-  console.log("发布失败，失败原因\n", err);
-  failCallbacks.promise().then(() => console.log("clean"));
+const basicCatchError = async (err) => {
+  const spinner = ora(info.error("发布失败，失败原因:" + err)).start();
+  await failCallbacks.promise().then(() => {
+    spinner.fail();
+  });
 };
 
 interface OptsType {
@@ -43,20 +45,38 @@ export const runSync = (command: stirng, isShowLog = false) => {
   } catch (error) {}
 };
 
-export const runAsync = async (command: stirng, isShowLog = false) => {
+export const runAsync = (command: stirng, isShowLog = false, spinner?) => {
   const log = isShowLog ? console.log : () => {};
+  log(info.info("\t执行命令:"), info.warning(command));
 
-  try {
-    log(info.info("\t执行命令:"), info.warning(command));
-    const { stdout, stderr } = await exec(command, {
-      cwd: process.cwd(),
-      encoding: "utf-8",
-    });
-    return {
-      stdout,
-      stderr,
-    };
+  return new Promise((resolve, reject) => {
+    exec(
+      command,
+      {
+        cwd: process.cwd(),
+        encoding: "utf-8",
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          spinner?.fail();
+          reject(error);
+          return;
+        }
+        resolve({
+          stdout,
+          stderr,
+        });
+
+        console.log(stdout, stderr);
+      },
+    );
+  });
+
+  /* try {
+    await 
   } catch (error) {
     console.log("error\n", error);
-  }
+    spinner?.fail();
+    return;
+  } */
 };

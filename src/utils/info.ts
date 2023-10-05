@@ -5,6 +5,7 @@ export const info = {
   error: chalk.redBright,
   succeed: chalk.greenBright,
   info: chalk.blueBright,
+  gray: chalk.grayBright,
 };
 
 export const taskPre = (logInfo: string, type: "start" | "end" = "start") => {

@@ -9,7 +9,9 @@ import { compose } from "./utils/core";
 /* 使用回调去注册事件 */
 import { failCallbacks } from "./utils/AsyncSeriresHook";
 import { gitPush, gitSoftReset } from "./steps/gitPush";
-import { setChangelog } from "./steps/setChangelog";
+import { getOldChangelog, setChangelog } from "./steps/setChangelog";
+import { ESLINT_PATH, SRC_PATH } from "./constants";
+import { eslint } from "./steps/eslint";
 
 /**
  * 注入全局所需读取的静态资源信息，如 package.json 内容
@@ -72,26 +74,38 @@ const middleware_updateVersion = async (next, ctxRef) => {
 };
 
 const middleware_gitPush = async (next, ctxRef) => {
-  const gitSoftResetFn = gitSoftReset();
+  const resetGitFn = gitSoftReset();
 
   /* 注册失败回调 */
-  failCallbacks.tapPromise(gitSoftResetFn);
+  failCallbacks.tapPromise(resetGitFn);
 
   await gitPush();
 
   next();
 };
 
-const middleware_changeLog = async () => {
+const middleware_changeLog = async (next) => {
+  const resetChangelogFn = await getOldChangelog();
+
+  /* 注册失败回调 */
+  failCallbacks.tapPromise(resetChangelogFn);
+
   await setChangelog();
+
+  next();
+};
+
+const middleware_eslint = async () => {
+  await eslint(SRC_PATH, ESLINT_PATH);
 };
 
 const middleware = [
   middleware_init,
   middleware_getNextVersion,
   middleware_updateVersion,
-  /* middleware_gitPush, */
+  middleware_gitPush,
   middleware_changeLog,
+  middleware_eslint,
 ];
 
 compose(middleware);
