@@ -8,7 +8,8 @@ import { compose } from "./utils/core";
 
 /* 使用回调去注册事件 */
 import { failCallbacks } from "./utils/AsyncSeriresHook";
-import { gitPush } from "./steps/gitPush";
+import { gitPush, gitSoftReset } from "./steps/gitPush";
+import { setChangelog } from "./steps/setChangelog";
 
 /**
  * 注入全局所需读取的静态资源信息，如 package.json 内容
@@ -18,9 +19,7 @@ const middleware_init = (next, ctxRef) => {
 
   /* 监听 ctrl + c 事件 */
   process.on("SIGINT", async function () {
-    await failCallbacks.promise().then(() => {
-      console.log("clean");
-    });
+    await failCallbacks.promise();
     process.exit(0);
   });
 
@@ -73,19 +72,26 @@ const middleware_updateVersion = async (next, ctxRef) => {
 };
 
 const middleware_gitPush = async (next, ctxRef) => {
-  const gitSoftResetFn = await gitPush();
+  const gitSoftResetFn = gitSoftReset();
 
   /* 注册失败回调 */
   failCallbacks.tapPromise(gitSoftResetFn);
 
+  await gitPush();
+
   next();
+};
+
+const middleware_changeLog = async () => {
+  await setChangelog();
 };
 
 const middleware = [
   middleware_init,
   middleware_getNextVersion,
   middleware_updateVersion,
-  middleware_gitPush,
+  /* middleware_gitPush, */
+  middleware_changeLog,
 ];
 
 compose(middleware);

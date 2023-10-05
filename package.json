@@ -1,6 +1,6 @@
 {
   "name": "jacky-tool-release",
-  "version": "5.5.2",
+  "version": "5.5.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -10,7 +10,9 @@
     "inquirer-interrupted-prompt": "^2.0.0",
     "ora": "^5.1.0",
     "semver": "^7.5.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "chalk": "^4.1.1",
+    "conventional-changelog-cli": "^2.2.2"
   },
   "scripts": {
     "test": "node ./dist/index.js",

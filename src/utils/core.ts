@@ -1,6 +1,7 @@
 import cp from "child_process";
 import ora, { promise } from "ora";
 import { failCallbacks } from "./AsyncSeriresHook";
+import { info } from "./info";
 const { execSync } = cp;
 
 const util = require("util");
@@ -8,8 +9,7 @@ const exec = util.promisify(cp.exec);
 
 const basicCatchError = (err) => {
   console.log("发布失败，失败原因\n", err);
-  failCallbacks.promise().then(()=> console.log("clean");
-  )
+  failCallbacks.promise().then(() => console.log("clean"));
 };
 
 interface OptsType {
@@ -35,20 +35,19 @@ export function compose(middleware, opts: OptsType = {}) {
   dispatch(0);
 }
 
-export const runSync = (command: stirng) => {
+export const runSync = (command: stirng, isShowLog = false) => {
+  const log = isShowLog ? console.log : () => {};
   try {
+    log(info.info("\t执行命令:"), info.warning(command));
     return execSync(command, { cwd: process.cwd(), encoding: "utf-8" });
   } catch (error) {}
 };
 
-export const runAsync = async (command: stirng, isShowSpin = false) => {
-  let spinner;
-
-  if (isShowSpin) {
-    spinner = ora(`开启执行 ${command} 命令`).start();
-  }
+export const runAsync = async (command: stirng, isShowLog = false) => {
+  const log = isShowLog ? console.log : () => {};
 
   try {
+    log(info.info("\t执行命令:"), info.warning(command));
     const { stdout, stderr } = await exec(command, {
       cwd: process.cwd(),
       encoding: "utf-8",
@@ -59,8 +58,5 @@ export const runAsync = async (command: stirng, isShowSpin = false) => {
     };
   } catch (error) {
     console.log("error\n", error);
-    spinner?.fail("task fail");
   }
-
-  spinner?.stop();
 };

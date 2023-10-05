@@ -3,6 +3,7 @@ import { COMMIT_REEOR_MESSAGE, DOT_GIT_DIR } from "../../constants";
 import { runAsync, runSync } from "../../utils/core";
 import ora from "ora";
 import fse from "fs-extra";
+import { taskPre } from "../../utils/info";
 /* import InterruptedPrompt from "inquirer-interrupted-prompt";
 
 InterruptedPrompt.fromAll(inquirer); */
@@ -62,7 +63,7 @@ export const gitPush = async () => {
     isValid = checkCommitLint(commitMsg);
   } while (!isValid);
 
-  const spinner = ora("准备推送代码至git仓库").start();
+  const spinner = ora(taskPre("准备推送代码至git仓库")).start();
 
   /* 获取当前 branch */
   const curBranchName = runSync("git symbolic-ref --short HEAD");
@@ -71,29 +72,29 @@ export const gitPush = async () => {
     `git branch -r | grep -w "origin/${curBranchName}"`,
   );
 
-  /* 获取当前 commit id */
-  const curCommitId = runSync("git rev-parse HEAD");
+  await runAsync(`git add .`, true);
 
-  await runAsync(`git add .`);
-
-  await runAsync(`git commit -m "${commitMsg}"`);
+  await runAsync(`git commit -m "${commitMsg}"`, true);
   if (!isExistCurBranch) {
     const { stdout, stderr } = await runAsync(
       `git push --set-upstream origin ${curBranchName}`,
+      true,
     );
     console.log("stdout", stdout);
     console.log("stderr", stderr);
   } else {
-    const { stdout, stderr } = await runAsync(`git push`);
+    const { stdout, stderr } = await runAsync(`git push`, true);
     console.log("stdout-1", stdout);
     console.log("stderr-2", stderr);
   }
 
-  spinner.succeed("已推送代码至git仓库");
+  spinner.succeed(taskPre("已推送代码至git仓库", "end"));
+};
 
-  return async () => {
-    console.log("执行了", curCommitId);
-
-    runSync(`git reset --soft ${curCommitId}`);
+export const gitSoftReset = () => {
+  /* 获取当前 commit id */
+  const curCommitId = runSync("git rev-parse HEAD");
+  return () => {
+    runSync(`git reset --soft ${curCommitId}`, true);
   };
 };
