@@ -71,11 +71,10 @@ export const gitPush = async () => {
     `git branch -r | grep -w "origin/${curBranchName}"`,
   );
 
-  /* runSync("ccc"); */
+  /* 获取当前 commit id */
+  const curCommitId = runSync("git rev-parse HEAD");
 
   await runAsync(`git add .`);
-
-  console.log("isExistCurBranch", isExistCurBranch);
 
   await runAsync(`git commit -m "${commitMsg}"`);
   if (!isExistCurBranch) {
@@ -91,4 +90,10 @@ export const gitPush = async () => {
   }
 
   spinner.succeed("已推送代码至git仓库");
+
+  return async () => {
+    console.log("执行了", curCommitId);
+
+    runSync(`git reset --soft ${curCommitId}`);
+  };
 };

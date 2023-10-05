@@ -73,7 +73,11 @@ const middleware_updateVersion = async (next, ctxRef) => {
 };
 
 const middleware_gitPush = async (next, ctxRef) => {
-  await gitPush();
+  const gitSoftResetFn = await gitPush();
+
+  /* 注册失败回调 */
+  failCallbacks.tapPromise(gitSoftResetFn);
+
   next();
 };
 

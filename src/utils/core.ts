@@ -23,6 +23,7 @@ export function compose(middleware, opts: OptsType = {}) {
   const ctxRef = { current: ctx };
 
   function dispatch(index) {
+    if (index === middleware.length) return;
     const curMiddleware = middleware[index];
     // 构造延时执行函数
     const next = (addOptions) => {
@@ -57,7 +58,7 @@ export const runAsync = async (command: stirng, isShowSpin = false) => {
       stderr,
     };
   } catch (error) {
-    console.log("error", error);
+    console.log("error\n", error);
     spinner?.fail("task fail");
   }
 
