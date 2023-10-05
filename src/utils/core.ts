@@ -8,6 +8,8 @@ const exec = util.promisify(cp.exec);
 
 const basicCatchError = (err) => {
   console.log("发布失败，失败原因\n", err);
+  failCallbacks.promise().then(()=> console.log("clean");
+  )
 };
 
 interface OptsType {
