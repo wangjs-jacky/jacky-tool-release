@@ -46,6 +46,7 @@ const middleware_init = (next, ctxRef) => {
   next();
 };
 
+/* 使用 semver 获取下一个版本信息 */
 const middleware_getNextVersion = async (next, ctxRef) => {
   const nextVersion = await selectNextVersion();
 
@@ -57,6 +58,9 @@ const middleware_getNextVersion = async (next, ctxRef) => {
   next();
 };
 
+/**
+ * 修改 package.json 版本更新
+ */
 const middleware_updateVersion = async (next, ctxRef) => {
   const { nextVersion, originPackageJson } = ctxRef.current;
 
@@ -70,6 +74,7 @@ const middleware_updateVersion = async (next, ctxRef) => {
 
 const middleware_gitPush = async (next, ctxRef) => {
   await gitPush();
+  next();
 };
 
 const middleware = [
