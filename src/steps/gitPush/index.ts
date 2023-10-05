@@ -75,11 +75,19 @@ export const gitPush = async () => {
 
   await runAsync(`git add .`);
 
+  console.log("isExistCurBranch", isExistCurBranch);
+
   await runAsync(`git commit -m "${commitMsg}"`);
   if (!isExistCurBranch) {
-    await runAsync(`git push --set-upstream origin ${curBranchName}`);
+    const { stdout, stderr } = await runAsync(
+      `git push --set-upstream origin ${curBranchName}`,
+    );
+    console.log("stdout", stdout);
+    console.log("stderr", stderr);
   } else {
-    await runAsync(`git push`);
+    const { stdout, stderr } = await runAsync(`git push`);
+    console.log("stdout-1", stdout);
+    console.log("stderr-2", stderr);
   }
 
   spinner.succeed("已推送代码至git仓库");
